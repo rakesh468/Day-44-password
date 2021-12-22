@@ -1,46 +1,21 @@
-import express, { request } from "express";
+import express from "express";
 import { MongoClient } from "mongodb";
+import dotenv from "dotenv";
+import { userRouter } from "./routes/user.js";
 
 
-const app=express()
-const PORT=4500;
+dotenv.config();
+
+const app=express();
+
+// server running under port-4500 //
+const PORT=process.env.PORT
 
 app.use(express.json());
 
-const users=[
-    {"id":"100",
-    "username":"rakesh kumar",
-    "email":"rakesh567@gmail.com",
-    "password":"password@123"
-},{
-    "id":"101",
-    "username":"prakash kumar",
-    "email":"prakash587@gmail.com",
-    "password":"welcome@123"
-},{
-    "id":"103",
-    "username":"murali",
-    "email":"murali007@gmail.com",
-    "password":"hello@123"
-},{
-    "id":"104",
-    "username":"manoj kumar",
-    "email":"manojmass@gmail.com",
-    "password":"home@123"
-},{
-    "id":"105",
-    "username":"vasudhevan",
-    "email":"vasu001@gmail.com",
-    "password":"vasu0123"
-},{
-    "id":"106",
-    "username":"nivetha",
-    "email":"nivetharaj@gmail.com",
-    "password":"nive@143",
-}
-]
+// to hide MONGO_URL using dotenv pacakage //
+const MONGO_URL=process.env.MONGO_URL;
 
-const MONGO_URL="mongodb://localhost";
 // connecting monogodb ///
 async function newconnection(){
     const client= new MongoClient(MONGO_URL)
@@ -48,44 +23,16 @@ async function newconnection(){
     console.log("Connected ");
     return client
 }
-const client=await newconnection();
+export const client=await newconnection();
 
 // building server //
 app.get("/",(request,response)=>{
     response.send("hello world")
 })
 
-// getting all data using /users ///
-app.get("/users",(request,response)=>{
-    response.send(users);
-})
+app.use("/users",userRouter)
 
-// filter username using request.query //
-app.get("/users",async(request,response)=>{
-    console.log(request.query)
-    const filter=request.query;
-    console.log(filter);
-    const filtername=await client.db("bwd28").collection("users").find(filter).toArray();
-    response.send(filtername);
-})
-
-// getting user by id ///
-app.get("/users/:id",async(request,response)=>{
-    const {id}=request.params;
-    const user=await client.db("bwd28").collection("users").findOne({id:id})
-    console.log(user)
-    user?response.send(user)
-    : response.send({message:"User not found"})
-})
-
-
-// create users by post method //
-app.post("/users",async(request,response)=>{
-    const data=request.body;
-    console.log(data);
-    const newuser=await client.db("bwd28").collection("users").insertOne(data);
-    response.send(newuser);
-});
 app.listen(PORT,()=>console.log("app runing in",PORT));
+
 
 
