@@ -1,8 +1,11 @@
-import express from "express";
+import express, { request } from "express";
+import { MongoClient } from "mongodb";
 
 
 const app=express()
 const PORT=4500;
+
+app.use(express.json());
 
 const users=[
     {"id":"100",
@@ -37,29 +40,52 @@ const users=[
 }
 ]
 
+const MONGO_URL="mongodb://localhost";
+// connecting monogodb ///
+async function newconnection(){
+    const client= new MongoClient(MONGO_URL)
+    await client.connect()
+    console.log("Connected ");
+    return client
+}
+const client=await newconnection();
 
+// building server //
 app.get("/",(request,response)=>{
     response.send("hello world")
 })
 
+// getting all data using /users ///
 app.get("/users",(request,response)=>{
     response.send(users);
 })
-app.get("/users/:id",(request,response)=>{
+
+// filter username using request.query //
+app.get("/users",async(request,response)=>{
+    console.log(request.query)
+    const filter=request.query;
+    console.log(filter);
+    const filtername=await client.db("bwd28").collection("users").find(filter).toArray();
+    response.send(filtername);
+})
+
+// getting user by id ///
+app.get("/users/:id",async(request,response)=>{
     const {id}=request.params;
-    const user=users.filter(us=>us.id===id)
+    const user=await client.db("bwd28").collection("users").findOne({id:id})
     console.log(user)
     user?response.send(user)
     : response.send({message:"User not found"})
 })
 
-app.get("/users",(request,response)=>{
-    const{username}=request.query;
-    const filtername=users.filter((us)=>us.username===username);
-    response.send(filtername);
-})
 
-
+// create users by post method //
+app.post("/users",async(request,response)=>{
+    const data=request.body;
+    console.log(data);
+    const newuser=await client.db("bwd28").collection("users").insertOne(data);
+    response.send(newuser);
+});
 app.listen(PORT,()=>console.log("app runing in",PORT));
 
 
