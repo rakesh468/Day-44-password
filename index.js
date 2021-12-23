@@ -2,7 +2,8 @@ import express from "express";
 import { MongoClient } from "mongodb";
 import dotenv from "dotenv";
 import { userRouter } from "./routes/user.js";
-
+import { usersRouter } from "./routes/users.js";
+import bcrypt from "bcrypt";
 
 dotenv.config();
 
@@ -31,6 +32,9 @@ app.get("/",(request,response)=>{
 })
 
 app.use("/users",userRouter)
+app.use("/user",usersRouter)
+
+
 
 app.listen(PORT,()=>console.log("app runing in",PORT));
 
