@@ -8,6 +8,6 @@ import jwt from "jsonwebtoken"
         next();
      }
    catch(err){
-       response.statuus(401).send({error:err.message})
+       response.status(401).send({error:err.message})
    }
 }
