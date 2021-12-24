@@ -1,6 +1,7 @@
 import express from "express";
 import { genpassword,createuser,getuserbyname } from "../helper.js";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 const router=express.Router();
 
 //signup part//
@@ -24,13 +25,12 @@ response.send(result);
 });// create users by post method //
 
 
-
 // login part//
 router.route("/login").post(async(request,response)=>{
     const {email,password}=request.body;
     const userfromdb=await getuserbyname(email)
     if(!userfromdb){
-        response.status(400).send({message:"Invalid credentials"})
+        response.status(401).send({message:"Invalid credentials"})
         return;
     }
     const storedpassword=userfromdb.password
@@ -38,14 +38,17 @@ router.route("/login").post(async(request,response)=>{
 
     const matchpassword=await bcrypt.compare(password,storedpassword)
     console.log(matchpassword)
+
+    // generating jwt token //
     if(matchpassword){
-        response.send({message:"successful login"})
+        const token=jwt.sign({id:userfromdb._id},process.env.SECRET_KEY)
+        response.send({message:"successful login",token:token})
         return;
     }else{
         response.send({message:"Invalid credentials"})
         return;
     }
-  response.send(userfromdb)
+  
 })
 
 
