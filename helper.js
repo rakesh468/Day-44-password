@@ -12,7 +12,7 @@ import bcrypt from "bcrypt";
 
 //create users//
  async function createusers(data) {
-    return await client.db("bwd28").collection("users").insertMany(data);
+    return await client.db("bwd28").collection("users").insertOne(data);
 }
 //get user by id//
  async function getuserbyId(id) {
