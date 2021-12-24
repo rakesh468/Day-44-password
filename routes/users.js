@@ -1,7 +1,6 @@
 import express from "express";
 import { genpassword,createuser,getuserbyname } from "../helper.js";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
 const router=express.Router();
 
 //signup part//
@@ -41,8 +40,7 @@ router.route("/login").post(async(request,response)=>{
 
     // generating jwt token //
     if(matchpassword){
-        const token=jwt.sign({id:userfromdb._id},process.env.SECRET_KEY)
-        response.send({message:"successful login",token:token})
+       response.send({message:"successful login"})
         return;
     }else{
         response.send({message:"Invalid credentials"})
