@@ -3,7 +3,7 @@ import { MongoClient } from "mongodb";
 import dotenv from "dotenv";
 import { userRouter } from "./routes/user.js";
 import { usersRouter } from "./routes/users.js";
-import bcrypt from "bcrypt";
+import cors from "cors";
 
 dotenv.config();
 
@@ -11,6 +11,7 @@ const app=express();
 
 // server running under port-4500 //
 const PORT=process.env.PORT
+app.use(cors())
 
 app.use(express.json());
 
